@@ -1,16 +1,116 @@
-# This is a sample Python script.
+import os
+from pathlib import Path
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql import functions as f
+from pyspark.sql.types import (StructType, StructField, StringType,
+                               TimestampType, IntegerType, DoubleType, LongType)
 
 
-# Press the green button in the gutter to run the script.
+dim_columns = ['id', 'name']
+
+vendor_rows = [
+    (1, 'Creative Mobile Technologies, LLC '),
+    (2, 'VeriFone Inc'),
+]
+
+rates_rows = [
+    (1, 'Standard rate'),
+    (2, 'JFK'),
+    (3, 'Newark'),
+    (4, 'Nassau of Westchester'),
+    (5, 'Negotiated fare'),
+    (6, 'Group ride'),
+]
+
+payment_rows = [
+    (1, 'Credit card'),
+    (1, 'Cash'),
+    (1, 'No charge'),
+    (1, 'Standard rate'),
+    (1, 'Dispute'),
+    (1, 'Unknown'),
+    (1, 'Voided trip'),
+]
+
+trips_schema = StructType([
+    StructField('VendorID', LongType(), True),
+    StructField('tpep_pickup_datetime', TimestampType(), True),
+    StructField('tpep_dropoff_datetime', TimestampType(), True),
+    StructField('Passenger_count', DoubleType(), True),
+    StructField('Trip_distance', DoubleType(), True),
+    StructField('RateCodeID', DoubleType(), True),
+    StructField('Store_and_fwd_flag', StringType(), True),
+    StructField('PULocationID', LongType(), True),
+    StructField('DOLocationID', LongType(), True),
+    StructField('Payment_type', LongType(), True),
+    StructField('Fare_amount', DoubleType(), True),
+    StructField('Extra', DoubleType(), True),
+    StructField('MTA_tax', DoubleType(), True),
+    StructField('Tip_amount', DoubleType(), True),
+    StructField('Tolls_amount', DoubleType(), True),
+    StructField('Improvement_surcharge', DoubleType(), True),
+    StructField('Total_amount', DoubleType(), True),
+    StructField('Congestion_Surcharge', DoubleType()),
+])
+
+
+def create_dict(spark: SparkSession, header: list[str], data: list):
+    df = spark.createDataFrame(data=data, schema=header)
+    return df
+
+
+def agg_calc(spark: SparkSession) -> DataFrame:
+
+    data_path = Path.home() / 'data' / 'nyc_yellow_taxi'
+
+    trip_fact = spark.read.schema(trips_schema).parquet(str(data_path))
+
+    datamart = trip_fact \
+        .where(trip_fact['VendorID'].isNotNull()) \
+        .groupby(trip_fact['VendorID'],
+                 trip_fact['Payment_type'],
+                 trip_fact['RateCodeID'],
+                 f.to_date(trip_fact['tpep_pickup_datetime']).alias('dt')
+                 ) \
+        .agg(f.sum(trip_fact['Total_amount']).alias('sum_amount'), f.avg(trip_fact['Tip_amount']).alias('avg_tips')) \
+        .select(f.col('dt'),
+                f.col('VendorID'),
+                f.col('Payment_type'),
+                f.col('RateCodeID'),
+                f.col('sum_amount'),
+                f.col('avg_tips')) \
+        .orderBy(f.col('dt').desc(), f.col('VendorID'))
+
+    return datamart
+
+
+def main(spark: SparkSession):
+    vendor_dim = create_dict(spark, dim_columns, vendor_rows)
+    payment_dim = create_dict(spark, dim_columns, payment_rows)
+    rates_dim = create_dict(spark, dim_columns, rates_rows)
+
+    datamart = agg_calc(spark).cache()
+    datamart.show(truncate=False, n=100)
+
+    joined_datamart = datamart \
+        .join(other=vendor_dim, on=vendor_dim['id'] == f.col('VendorID'), how='inner') \
+        .join(other=payment_dim, on=payment_dim['id'] == f.col('Payment_type'), how='inner') \
+        .join(other=rates_dim, on=rates_dim['id'] == f.col('RateCodeID'), how='inner') \
+        .select(f.col('dt'),
+                f.col('VendorID'), f.col('Payment_type'), f.col('RateCodeID'), f.col('sum_amount'),
+                f.col('avg_tips'),
+                rates_dim['name'].alias('rate_name'), vendor_dim['name'].alias('vendor_name'),
+                payment_dim['name'].alias('payment_name')
+                )
+
+    joined_datamart.show(truncate=False, n=50)
+    print('end')
+
+
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    main(SparkSession
+         .builder
+         .appName('My first spark job')
+         .getOrCreate())
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
