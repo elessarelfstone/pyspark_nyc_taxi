@@ -79,6 +79,8 @@ def save_to_mysql(host: str, port: int, db_name: str, username: str,
         'sslmode': 'none'
     }
 
+    # .mode('appand')
+    # .mode('')
     df.write.jdbc(
         url=f'jdbc:mysql://{host}:{port}/{db_name}',
         table=table_name,
