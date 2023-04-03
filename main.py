@@ -7,6 +7,14 @@ from pyspark.sql.types import (StructType, StructField, StringType,
                                TimestampType, IntegerType, DoubleType, LongType)
 
 
+MYSQL_HOST = 'localhost'
+MYSQL_PORT = 3306
+MYSQL_DATABASE = 'data'
+MYSQL_TABLE = 'pyspark_lab'
+MYSQL_USER = 'user'
+MYSQL_PASSWORD = 'my-secret'
+
+
 dim_columns = ['id', 'name']
 
 vendor_rows = [
@@ -60,6 +68,24 @@ def create_dict(spark: SparkSession, header: list[str], data: list):
     return df
 
 
+def save_to_mysql(host: str, port: int, db_name: str, username: str,
+                  password: str, df: DataFrame, table_name: str):
+
+    props = {
+        'user': f'{username}',
+        'password': f'{password}',
+        'driver': 'com.mysql.cj.jdbc.Driver',
+        'ssl': 'true',
+        'sslmode': 'none'
+    }
+
+    df.write.jdbc(
+        url=f'jdbc:mysql://{host}:{port}/{db_name}',
+        table=table_name,
+        properties=props
+    )
+
+
 def agg_calc(spark: SparkSession) -> DataFrame:
 
     data_path = Path.home() / 'data' / 'nyc_yellow_taxi'
@@ -105,12 +131,22 @@ def main(spark: SparkSession):
                 )
 
     joined_datamart.show(truncate=False, n=50)
-    print('end')
+
+    save_to_mysql(
+        host=MYSQL_HOST,
+        port=MYSQL_PORT,
+        db_name=MYSQL_DATABASE,
+        username=MYSQL_USER,
+        password=MYSQL_PASSWORD,
+        df=joined_datamart,
+        table_name=f'{MYSQL_DATABASE}.{MYSQL_TABLE}'
+    )
+    # print('end')
 
 
 if __name__ == '__main__':
     main(SparkSession
          .builder
+         .config('spark.jars', './mysql-connector-java-8.0.25.jar')
          .appName('My first spark job')
          .getOrCreate())
-
