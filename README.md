@@ -28,13 +28,13 @@ To run this project you have to declare some enviroment variables, which are:
 _PYSPARK_PYTHON_ is a path to your Python binary. It's very important for Workers to be set with that to run calculation stuff, overwise exception will be raised. 
 
 ```bash
-HADOOP_HOME=/home/user/projects/pyspark_nyc_taxi/venv/bin/python
+PYSPARK_PYTHON=/home/user/projects/pyspark_nyc_taxi/venv/bin/python
 ```
 
 or for Windows:
 
 ```bash
-HADOOP_HOME=c:\Users\user\projects\pyspark_nyc_taxi\venv\Scripts\python.exe
+PYSPARK_PYTHON=c:\Users\user\projects\pyspark_nyc_taxi\venv\Scripts\python.exe
 ```
 
 _HADOOP_HOME_ is a path to Hadoop directory. If you haven't installed Hadoop on your local machine use the a PySpark directory. So it could be like:
