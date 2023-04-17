@@ -20,6 +20,9 @@ MYSQL_TABLE = 'pyspark_lab'
 MYSQL_USER = 'user'
 MYSQL_PASSWORD = 'my-secret'
 ```
+
+## Run
+
 To run this project you have to declare some enviroment variables, which are:
 
 _PYSPARK_PYTHON_ is a path to your Python binary. It's very important for Workers to be set with that to run calculation stuff, overwise exception will be raised. 
@@ -27,8 +30,6 @@ _PYSPARK_PYTHON_ is a path to your Python binary. It's very important for Worker
 ```bash
 HADOOP_HOME=/home/user/projects/pyspark_nyc_taxi/venv/bin/python
 ```
-
-## Run
 
 or for Windows:
 
