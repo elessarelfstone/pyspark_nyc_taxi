@@ -4,7 +4,7 @@ Just a simple demonstration of using PySpark.
 
 ## Data
 
-Download Yellow taxi trip records(PARQUET files) from [here](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page) and save it to here:
+Download Yellow taxi trip records(PARQUET files) from [here](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page) and save it here:
 
 ```python
 Path.home() / 'data' / 'nyc_yellow_taxi'
@@ -37,7 +37,7 @@ or for Windows:
 PYSPARK_PYTHON=c:\Users\user\projects\pyspark_nyc_taxi\venv\Scripts\python.exe
 ```
 
-_HADOOP_HOME_ is a path to Hadoop directory. If you haven't installed Hadoop on your local machine use the a PySpark directory. So it could be like:
+_HADOOP_HOME_ is a path to Hadoop directory. If you haven't installed Hadoop on your local machine use PySpark directory. So it could be like:
 
 ```bash
 HADOOP_HOME=/home/user/projects/pyspark_nyc_taxi/venv/lib/python3.9/site-packages/pyspark
