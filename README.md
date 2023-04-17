@@ -28,6 +28,8 @@ _PYSPARK_PYTHON_ is a path to your Python binary. It's very important for Worker
 HADOOP_HOME=/home/user/projects/pyspark_nyc_taxi/venv/bin/python
 ```
 
+## Run
+
 or for Windows:
 
 ```bash
