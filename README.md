@@ -23,7 +23,15 @@ MYSQL_PASSWORD = 'my-secret'
 
 ## Run
 
-To run this project you have to declare some enviroment variables, which are:
+To run the PySpark application, you would need Java 8 or a later version hence download the Java version from Oracle and install it on your system.
+
+Post-installation set JAVA_HOME and PATH variable
+
+```bash
+JAVA_HOME = C:\Program Files\Java\jdk1.8.0_201
+PATH = %PATH%;C:\Program Files\Java\jdk1.8.0_201\bin
+```
+Further, declare some enviroment variables, which are:
 
 _PYSPARK_PYTHON_ is a path to your Python binary. It's very important for Workers to be set with that to run calculation stuff, overwise exception will be raised. 
 
@@ -49,5 +57,5 @@ or for Windows:
 HADOOP_HOME=c:\Users\user\projects\pyspark_nyc_taxi\venv\Lib\site-packages\pyspark
 ```
 
-Also, if you run this on Windows you'll need to download wintools.exe and copy it to %HADOOP_HOME%\bin folder. Winutils are different for each Hadoop version hence download the right version from [here](https://github.com/steveloughran/winutils)
+Also, if you run this on Windows you'll need to download _wintools.exe_ and copy it to %HADOOP_HOME%\bin folder. Winutils are different for each Hadoop version hence download the right version from [here](https://github.com/steveloughran/winutils).
 
