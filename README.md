@@ -48,3 +48,6 @@ or for Windows:
 ```bash
 HADOOP_HOME=c:\Users\user\projects\pyspark_nyc_taxi\venv\Lib\site-packages\pyspark
 ```
+
+Also, if you run this on Windows you'll need to download wintools.exe and copy it to %HADOOP_HOME%\bin folder. Winutils are different for each Hadoop version hence download the right version from [here](https://github.com/steveloughran/winutils)
+
